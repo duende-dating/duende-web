@@ -1,0 +1,64 @@
+# Builds the static export and publishes it to GitHub Pages.
+#
+# The site is served from https://duende-dating.github.io/duende-web, so every
+# asset has to be prefixed with the repository name. NEXT_PUBLIC_BASE_PATH is
+# what next.config.ts reads for that; `npm run dev` leaves it unset and serves
+# from the root. The day a custom domain lands, drop the variable and add a
+# CNAME file to public/.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # So a deployment can be replayed without an empty commit.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# A queued run waits for the one in flight rather than cancelling it: cancelling
+# a deployment half way is how a site ends up serving a partial export.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Verify
+        run: |
+          npm run typecheck
+          npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /duende-web
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

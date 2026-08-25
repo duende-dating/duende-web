@@ -1,0 +1,155 @@
+@import 'tailwindcss';
+
+/**
+ * Palette "Bouteille", carried over from the app: one deep green on white, and
+ * nothing else.
+ *
+ * There is no accent colour and no dark theme. What carries the hierarchy is
+ * the fill — on any screen exactly one block is solid, and that is the action.
+ * Everything else is a rule, an outline, or a step down the opacity ladder.
+ * Every neutral is the ink laid over the ground at a stated opacity, resolved
+ * to a flat value, so the greys keep the ink's hue instead of drifting to a
+ * neutral that would read as a second colour.
+ */
+@theme {
+  /* The ink. Everything readable is this, or this at reduced opacity. */
+  --color-ink: #123a2e;
+  /* The ground. 12.57:1 against the ink. */
+  --color-ground: #ffffff;
+  /* Ink at 6% — cards, anything that is a surface rather than a page. */
+  --color-surface: #f1f3f2;
+  /* Ink at 12%. */
+  --color-surface-strong: #e3e7e6;
+  /* Ink at 80%: 6.79:1. Below roughly 62% it stops clearing AA. */
+  --color-muted: #416158;
+  /* Ink at 14%. */
+  --color-rule: #dee3e2;
+  --color-zone-border: #bdc8c4;
+  /* White at 55% over the ink: 4.94:1, present without competing. */
+  --color-on-ink-muted: #94a6a1;
+  /* The single exception to the two colours: destructive has to look it. */
+  --color-danger: #9b2c1a;
+
+  /* One radius scale, so a control never picks its own corner. */
+  --radius-control: 16px;
+  --radius-card: 20px;
+
+  --font-sans:
+    var(--font-spline-sans), 'Spline Sans', Inter, ui-sans-serif, system-ui, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji';
+}
+
+:root {
+  /* The app has one appearance. Saying so stops the browser offering the page
+     a dark one it has no colours for. */
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background-color: var(--color-ground);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The eyebrow above a section title. 11px/1 tracking/700, as in the app. */
+@utility eyebrow {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* Long-form legal copy: the one place on the site with running prose. */
+.prose-legal {
+  max-width: 68ch;
+}
+
+.prose-legal h2 {
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.prose-legal h3 {
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.prose-legal p,
+.prose-legal ul,
+.prose-legal ol {
+  margin-bottom: 1rem;
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+.prose-legal ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.prose-legal ul > li {
+  position: relative;
+  padding-left: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose-legal ul > li::before {
+  content: '';
+  position: absolute;
+  left: 0.125rem;
+  top: 0.7rem;
+  width: 0.375rem;
+  height: 1px;
+  background-color: var(--color-zone-border);
+}
+
+.prose-legal strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+/*
+ * `:not([data-button])` is the whole reason buttons carry that attribute: this
+ * rule is unlayered and therefore beats any Tailwind utility, so without the
+ * exclusion a filled button inside the prose gets ink-coloured, underlined
+ * text on an ink ground and disappears.
+ */
+.prose-legal a:not([data-button]) {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-zone-border);
+}
+
+.prose-legal a:not([data-button]):hover {
+  text-decoration-color: var(--color-ink);
+}
+
+/**
+ * Inside an inverted band the ink is the ground, so the secondary ink would
+ * disappear into it. The eyebrow is the one piece that carries its colour in
+ * CSS rather than in a class, so it is the one piece that needs telling.
+ */
+.on-ink .eyebrow {
+  color: var(--color-on-ink-muted);
+}
